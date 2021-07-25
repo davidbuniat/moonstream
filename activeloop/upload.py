@@ -14,16 +14,24 @@ def create_dataset(sample, uri='./data/v1'):
     return ds
 
 if __name__ == "__main__":
-    uri = './data/v4'
-    if True:
-        sample = get_sample('./sample_2.json')
+    uri = './data/v5' # put s3 link here
+    uri = "s3://internal-datasets/bugout/ethereum/v2"
+    if False:
+        sample = get_sample('./ethereum.json')
         ds = create_dataset(sample, uri)
+        with ds:
+            for s in tqdm([sample]*100000): # 1.2B
+                for k,v in s.items():
+                    ds[k].append(v)
 
-        for s in tqdm([sample]*100000): 
-            for k,v in s.items():
-                ds[k].append(v)
-    
     ds = hub.Dataset(uri)
 
-    for el in ds.pytorch():
-        print(el.gas.numpy())
+    for el in tqdm(ds):
+        el.gas.numpy()
+        # el.to.numpy() # error in reading string
+        # el['from'].numpy()
+        # el.hash.numpy()
+        # el.value.numpy()
+        # el.input.numpy()
+        el.gasPrice.numpy()
+        # print(el.gas.numpy())
